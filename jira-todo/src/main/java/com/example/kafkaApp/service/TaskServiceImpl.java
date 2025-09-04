@@ -21,9 +21,9 @@ public class TaskServiceImpl implements TaskService {
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
-    private final KafkaTemplate<String, TaskCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public TaskServiceImpl(UserRepository userRepository, TaskRepository taskRepository, KafkaTemplate<String, TaskCreatedEvent> kafkaTemplate) {
+    public TaskServiceImpl(UserRepository userRepository, TaskRepository taskRepository, KafkaTemplate<String, Object> kafkaTemplate) {
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.kafkaTemplate = kafkaTemplate;

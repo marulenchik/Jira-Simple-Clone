@@ -2,7 +2,6 @@ package com.example.kafkaApp.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.example.core.TaskCreatedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +9,7 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +23,6 @@ public class KafkaConfig {
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;
 
-    @Value("${spring.kafka.producer.value-serializer}")
-    private String valueSerializer;
-
     @Value("${spring.kafka.producer.acks}")
     private String acks;
 
@@ -38,12 +35,13 @@ public class KafkaConfig {
     @Value("${spring.kafka.producer.properties.request.timeout.ms}")
     private String requestTimeout;
 
-    Map<String, Object> producerConfigs()  {
+    private Map<String, Object> producerConfigs() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        // значение сериализуем через JSON, чтобы можно было слать разные типы объектов
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         config.put(ProducerConfig.ACKS_CONFIG, acks);
         config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeout);
         config.put(ProducerConfig.LINGER_MS_CONFIG, linger);
@@ -53,18 +51,17 @@ public class KafkaConfig {
     }
 
     @Bean
-    ProducerFactory<String, TaskCreatedEvent> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    KafkaTemplate<String, TaskCreatedEvent> kafkaTemplate() {
-        return new KafkaTemplate<String, TaskCreatedEvent>(producerFactory());
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
     }
 
-
     @Bean
-    NewTopic topic() {
+    public NewTopic taskTopic() {
         return TopicBuilder.name("task-create-events-topic")
                 .partitions(3)
                 .replicas(1)
@@ -72,4 +69,12 @@ public class KafkaConfig {
                 .build();
     }
 
+    @Bean
+    public NewTopic commentTopic() {
+        return TopicBuilder.name("comment-create-events-topic")
+                .partitions(3)
+                .replicas(1)
+                .configs(Map.of("min.insync.replicas", "1"))
+                .build();
+    }
 }
