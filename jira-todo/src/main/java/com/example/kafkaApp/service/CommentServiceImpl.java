@@ -50,7 +50,6 @@ public class CommentServiceImpl implements CommentService {
                 taskId
         );
 
-        // 5. Отправляем в Kafka
         kafkaTemplate.send("comment-create-events-topic", commentId, commentCreatedEvent);
 
         return commentId;

@@ -20,11 +20,9 @@ public class User {
     private String username;
     private String password;
 
-    // Один пользователь может быть исполнителем у многих задач
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> assignedTasks = new ArrayList<>();
 
-    // Один пользователь может оставлять много комментариев
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 }

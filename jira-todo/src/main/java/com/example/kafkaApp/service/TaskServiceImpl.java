@@ -57,7 +57,7 @@ public class TaskServiceImpl implements TaskService {
         TaskCreatedEvent taskCreatedEvent = new TaskCreatedEvent(
                 taskId,
                 savedTask.getName(),
-                savedTask. getDescription()
+                savedTask.getDescription()
         );
 
         // 5. Отправляем в Kafka

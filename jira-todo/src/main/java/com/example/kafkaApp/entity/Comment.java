@@ -17,12 +17,10 @@ public class Comment {
 
     private String content;
 
-    // Каждый комментарий привязан к конкретной задаче
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
-    // Каждый комментарий принадлежит конкретному пользователю
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
